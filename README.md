@@ -1,0 +1,2 @@
+# GML
+GameMaker Language
