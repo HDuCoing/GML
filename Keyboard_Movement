@@ -1,0 +1,50 @@
+//Write in create for object-player
+state = PlayerStateFree;
+//collision with walls
+collisionMap = layer_tilemap_get_id(layer_get_id("CollisionLayer"));
+
+//Walk animation speeds
+hSpeed = 0;
+vSpeed = 0;
+//walking/running speed
+moveSpeed = 1.5;
+image_speed = 0;
+sprite_frame = 0;
+
+//Write in step event
+left = keyboard_check(vk_left) or keyboard_check(ord("A"));
+right = keyboard_check(vk_right) or keyboard_check(ord("D"));
+up = keyboard_check(vk_up) or keyboard_check(ord("W"));
+down = keyboard_check(vk_down) or keyboard_check(ord("S"));
+keyRoll = keyboard_check_pressed(vk_space); // Roll on ground
+keyUse = keyboard_check_pressed(ord("E")); // Grab, open, chat, etc.
+keyAttack = keyboard_check_pressed(ord("F")); // Attack
+
+inputDirection = point_direction(0, 0, right-left, down-up);
+inputMagnitude = (right - left != 0) || (down - up != 0);
+script_execute(state);
+
+//Write in new script "PlayerStateFree"
+function PlayerStateFree(){
+	hSpeed = lengthdir_x(inputMagnitude * moveSpeed, inputDirection);
+	vSpeed = lengthdir_y(inputMagnitude * moveSpeed, inputDirection);
+	var diagnol = 1;
+	PlayerCollision();
+	//updates sprite index
+	var _old_sprite = sprite_index;
+	if(inputMagnitude != 0)
+	{
+		direction = inputDirection;
+		sprite_index = spriteRun; //walking or running for casual
+		// Running/Sprinting
+		if(keyboard_check(vk_shift)) {moveSpeed = 2;}
+	} else sprite_index = spriteIdle; // idle standing poses
+	
+	if((hSpeed * vSpeed) != 0) diagnol = sqrt(2)/2;
+
+	if (_old_sprite != sprite_index) sprite_frame = 0;
+	x += hSpeed * moveSpeed * diagnol;
+	y += vSpeed * moveSpeed * diagnol;
+// Update image index
+	Player_Animation();
+}
